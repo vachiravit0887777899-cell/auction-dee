@@ -46,6 +46,42 @@ class AdminController extends Controller
         return view('admin.products', compact('products'));
     }
 
+    // หน้าฟอร์มแก้ไขสินค้า
+    public function editProduct(Product $product)
+    {
+        return view('admin.products-edit', compact('product'));
+    }
+
+    // บันทึกการแก้ไขสินค้า
+    // บันทึกการแก้ไขสินค้า
+    public function updateProduct(Request $request, Product $product)
+    {
+        $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:5000'],
+            'image' => ['nullable', 'image', 'max:2048'],
+            'starting_price' => ['required', 'numeric', 'min:1'],
+            'bid_increment' => ['required', 'numeric', 'min:1'],
+            'ends_at' => ['required', 'date'],
+            'status' => ['required', 'in:active,ended,cancelled'],
+        ]);
+
+        $data = $request->only([
+            'title', 'description', 'starting_price', 'bid_increment', 'ends_at', 'status',
+        ]);
+
+        if ($request->hasFile('image')) {
+            // ลบรูปเก่าทิ้ง ถ้ามี
+            if ($product->image) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($product->image);
+            }
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        $product->update($data);
+
+        return redirect()->route('admin.products')->with('success', 'แก้ไขสินค้าเรียบร้อยแล้ว');
+    }
     // ลบสินค้า (admin เท่านั้น)
     public function destroyProduct(Product $product)
     {

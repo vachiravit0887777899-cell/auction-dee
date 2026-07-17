@@ -35,15 +35,20 @@
                             @endif
                         </td>
                         <td class="px-6 py-4">
-                            <form method="POST" action="{{ route('admin.products.destroy', $product) }}"
-                                  onsubmit="return confirm('ยืนยันลบสินค้านี้? การกระทำนี้ไม่สามารถย้อนกลับได้');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-400 hover:text-red-300 flex items-center gap-1 text-xs font-medium">
-                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> ลบ
-                                </button>
-                            </form>
-                        </td>
+    <div class="flex items-center gap-3">
+        <a href="{{ route('admin.products.edit', $product) }}" class="text-gold-soft hover:text-gold-soft/70 flex items-center gap-1 text-xs font-medium">
+            <i data-lucide="pencil" class="w-3.5 h-3.5"></i> แก้ไข
+        </a>
+        <form method="POST" action="{{ route('admin.products.destroy', $product) }}"
+              onsubmit="return confirm('ยืนยันลบสินค้านี้? การกระทำนี้ไม่สามารถย้อนกลับได้');">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="text-red-400 hover:text-red-300 flex items-center gap-1 text-xs font-medium">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> ลบ
+            </button>
+        </form>
+    </div>
+</td>
                     </tr>
                 @endforeach
             </tbody>
