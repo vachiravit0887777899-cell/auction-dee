@@ -13,7 +13,6 @@
         <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     </head>
     <body class="font-sans antialiased bg-vault-black">
-    <x-page-transition />
     <x-vault-atmosphere />
     <div class="min-h-screen flex flex-col items-center justify-center relative overflow-hidden py-10 z-10">
 
