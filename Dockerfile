@@ -1,6 +1,13 @@
 # Stage 1: Build frontend assets
 FROM node:20-alpine AS node_build
 WORKDIR /app
+
+ENV VITE_PUSHER_APP_KEY=fcc4e23ce4ca4b8545a9
+ENV VITE_PUSHER_HOST=
+ENV VITE_PUSHER_PORT=443
+ENV VITE_PUSHER_SCHEME=https
+ENV VITE_PUSHER_APP_CLUSTER=ap1
+
 COPY package*.json ./
 RUN npm install
 COPY . .
