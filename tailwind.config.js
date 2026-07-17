@@ -1,7 +1,6 @@
 import defaultTheme from 'tailwindcss/defaultTheme';
 import forms from '@tailwindcss/forms';
 
-/** @type {import('tailwindcss').Config} */
 export default {
     content: [
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
@@ -12,32 +11,29 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Plus Jakarta Sans', ...defaultTheme.fontFamily.sans],
+                sans: ['Inter', ...defaultTheme.fontFamily.sans],
+                serif: ['Cormorant Garamond', 'serif'],
             },
             colors: {
-                primary: {
-                    50: '#eef2ff',
-                    100: '#e0e7ff',
-                    500: '#6366f1',
-                    600: '#4F46E5',
-                    700: '#4338ca',
+                vault: {
+                    black: '#050505',
+                    obsidian: '#101010',
+                    stone: '#181818',
+                    border: '#2a2620',
                 },
-                accent: {
-                    500: '#F59E0B',
+                gold: {
+                    soft: '#e8cf8a',
+                    DEFAULT: '#CFAE45',
+                    dark: '#8a712c',
                 },
-                success: {
-                    500: '#10B981',
-                },
-                danger: {
-                    500: '#EF4444',
+                ink: {
+                    primary: '#f4f0e6',
+                    secondary: '#9a978d',
                 },
             },
             boxShadow: {
-                soft: '0 2px 12px rgba(0, 0, 0, 0.06)',
-                card: '0 4px 20px rgba(0, 0, 0, 0.08)',
-            },
-            borderRadius: {
-                xl2: '18px',
+                gold: '0 0 30px rgba(207,174,69,0.25)',
+                card: '0 10px 30px rgba(0,0,0,0.5)',
             },
         },
     },
