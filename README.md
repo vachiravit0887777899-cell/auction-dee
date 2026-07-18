@@ -1,58 +1,153 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🗝️ Auction Dee
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Real-time auction marketplace** ธีม "Hidden Vault" — เว็บประมูลสินค้าออนไลน์แบบเรียลไทม์ พัฒนาด้วย Laravel
 
-## About Laravel
+🔗 **Live Demo:** https://auction-dee-1.onrender.com
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## ✨ ฟีเจอร์หลัก
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### สำหรับผู้ใช้ทั่วไป
+- สมัครสมาชิก / เข้าสู่ระบบ (Laravel Breeze)
+- ลงสินค้าประมูล พร้อมอัปโหลดรูปภาพ, กำหนดราคาเริ่มต้น, ขั้นต่ำการบิดเพิ่ม, เวลาปิดประมูล
+- **บิดราคาแบบเรียลไทม์** — เห็นราคาล่าสุด/ประวัติการบิดของคนอื่นทันทีโดยไม่ต้องรีเฟรชหน้า (ผ่าน WebSocket)
+- ระบบป้องกัน race condition ตอนมีคนบิดพร้อมกัน (DB transaction + row locking)
+- แจ้งเตือนเมื่อมีคนบิดสูงกว่า / เมื่อประมูลปิดและมีผู้ชนะ
+- Dashboard ส่วนตัว — ดูสินค้าที่ลงขาย และสินค้าที่กำลังประมูลอยู่ พร้อมสถานะ "กำลังนำ / ถูกแซง / ชนะ / แพ้"
+- นับถอยหลังเวลาปิดประมูลแบบเรียลไทม์
 
-## Learning Laravel
+### สำหรับ Admin
+- Dashboard สรุปภาพรวมระบบ (จำนวนผู้ใช้, สินค้า, ยอดขายรวม)
+- จัดการสินค้า — ดู / แก้ไข (รวมเปลี่ยนรูปภาพ) / ลบ
+- จัดการผู้ใช้ — ตั้ง/ถอดสิทธิ์ Admin
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### ระบบอัตโนมัติ
+- ปิดประมูลอัตโนมัติเมื่อหมดเวลา พร้อมประกาศผู้ชนะจากราคาบิดสูงสุด
+- ส่ง Notification ให้ทั้งผู้ชนะและเจ้าของสินค้าโดยอัตโนมัติ
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## 🛠️ Tech Stack
 
-## Agentic Development
+| ส่วน | เทคโนโลยี |
+|---|---|
+| Backend | Laravel 13 (PHP 8.4) |
+| Database | PostgreSQL (Neon — serverless Postgres) |
+| Real-time / WebSocket | Pusher Channels |
+| Frontend | Blade + Tailwind CSS + Alpine.js |
+| Auth | Laravel Breeze |
+| Icons | Lucide |
+| Deployment | Render (Docker) |
+| Source Control | GitHub |
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+---
 
-```bash
-composer require laravel/boost --dev
+## 🏗️ สถาปัตยกรรมระบบ
 
-php artisan boost:install
+```
+User บิดราคา
+    → Laravel บันทึกลง DB (transaction + lockForUpdate)
+    → Broadcast event ผ่าน Pusher
+    → ทุกคนที่เปิดหน้าสินค้าเดียวกันเห็นราคาอัปเดตทันที (Laravel Echo)
+
+Scheduler เช็คสินค้าหมดเวลา
+    → เปลี่ยนสถานะเป็น "ended" + กำหนดผู้ชนะ
+    → ส่ง Notification ให้ผู้ชนะและเจ้าของสินค้า
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+เนื่องจาก deploy บน Render free tier (ไม่มี background worker แบบเสียเงิน) ระบบจึงปรับให้:
+- **Broadcasting**: ใช้ Pusher (บริการภายนอก) แทนการรัน Laravel Reverb เอง
+- **Queue**: ใช้ `sync` driver แทนการรัน `queue:work` ค้างไว้
+- **Scheduler**: มี route ลับ (ป้องกันด้วย secret token) ให้บริการ cron ภายนอกยิงเข้ามาปิดประมูลอัตโนมัติ แทนการรัน `schedule:work` ค้างไว้
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 📂 โครงสร้างที่สำคัญ
 
-## Code of Conduct
+```
+app/
+  Console/Commands/CloseExpiredAuctions.php   # คำสั่งปิดประมูลอัตโนมัติ
+  Events/NewBidPlaced.php                     # Event ยิงตอนมีคนบิดใหม่
+  Http/Controllers/ProductController.php      # CRUD สินค้า + บิด
+  Http/Controllers/Admin/AdminController.php  # Admin panel
+  Http/Middleware/EnsureUserIsAdmin.php       # กันสิทธิ์เข้าหน้า admin
+  Notifications/AuctionWon.php                # แจ้งเตือนผู้ชนะ
+  Notifications/AuctionEnded.php              # แจ้งเตือนเจ้าของสินค้า
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+resources/
+  views/products/                             # หน้ารายการ/รายละเอียด/สร้างสินค้า
+  views/admin/                                 # Admin panel views
+  views/components/vault-entrance.blade.php   # แอนิเมชันประตูวอลต์ (ครั้งแรกต่อแท็บ)
+  views/components/vault-atmosphere.blade.php # หมอก/ฝุ่นทอง/แสง ลอยพื้นหลัง
+  js/echo.js                                   # ตั้งค่า Laravel Echo + Pusher
 
-## Security Vulnerabilities
+Dockerfile                                     # Multi-stage build (Node build assets + PHP runtime)
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## ⚙️ การติดตั้งใช้งาน (Local)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### สิ่งที่ต้องมี
+- PHP >= 8.4, Composer
+- Node.js + npm
+- PostgreSQL (หรือใช้ Neon)
+
+### ขั้นตอน
+
+```bash
+composer install
+npm install
+
+cp .env.example .env
+php artisan key:generate
+```
+
+ตั้งค่าในไฟล์ `.env`:
+- `DB_*` — ข้อมูลเชื่อมต่อฐานข้อมูล PostgreSQL
+- `PUSHER_*` / `VITE_PUSHER_*` — API key จาก https://pusher.com (มี free tier)
+- `CRON_SECRET` — สุ่มค่าเองด้วย `php artisan tinker` → `Str::random(40)`
+
+```bash
+php artisan migrate
+php artisan storage:link
+npm run build   # หรือ npm run dev ตอน dev
+php artisan serve
+```
+
+เปิดใช้งานฟีเจอร์เสริม (ไม่บังคับตอน dev):
+
+```bash
+php artisan queue:work        # ประมวลผล notification
+php artisan schedule:work     # ปิดประมูลอัตโนมัติทุกนาที
+```
+
+### ตั้งสิทธิ์ Admin คนแรก
+
+```bash
+php artisan tinker
+```
+```php
+User::where('email', 'your@email.com')->first()->update(['is_admin' => true]);
+```
+
+---
+
+## 🚀 Deployment (Render + Neon + Pusher)
+
+โปรเจกต์นี้ deploy ผ่าน **Docker** บน Render (Render ไม่รองรับ PHP runtime แบบ native จึงต้องใช้ Dockerfile)
+
+1. Push โค้ดขึ้น GitHub
+2. สร้าง Web Service บน Render โดยเลือก Environment เป็น **Docker** (จะ detect `Dockerfile` อัตโนมัติ)
+3. ตั้งค่า Environment Variables ให้ครบ (ดู `.env.example` เป็นแนวทาง) รวมถึง `APP_URL` เป็น domain จริงที่ Render ให้มา
+4. Deploy — Dockerfile จะ build assets ผ่าน Node stage แล้วรัน Laravel ผ่าน PHP stage, รัน migration อัตโนมัติทุกครั้งที่ container เริ่มทำงาน
+5. ตั้งค่า cron ภายนอก (เช่น cron-job.org) ให้ยิง `https://<your-domain>/cron/close-expired-auctions/{CRON_SECRET}` เป็นระยะ เพื่อปิดประมูลอัตโนมัติบน production
+
+> ⚠️ **ข้อจำกัดบน Render free tier:** Storage ไม่ persistent — รูปภาพที่ผู้ใช้ upload จะหายเมื่อมีการ deploy ใหม่ (แนวทางแก้ในอนาคต: ย้ายไปใช้ Cloudinary หรือ S3-compatible storage)
+
+---
+
+## 📝 หมายเหตุ
+
+โปรเจกต์นี้เป็นงานเรียนรู้ Laravel แบบครบวงจร ตั้งแต่ CRUD พื้นฐาน, WebSocket real-time, background job/scheduler, ไปจนถึงการ deploy จริงบน cloud platform พร้อมแก้ปัญหาที่พบระหว่างทาง (database connection pooling, PHP version, Docker multi-stage build, Vite env var baking ฯลฯ)
